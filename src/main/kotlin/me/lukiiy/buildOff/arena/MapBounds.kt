@@ -1,11 +1,17 @@
 package me.lukiiy.buildOff.arena
 
 import org.bukkit.Location
-import kotlin.math.absoluteValue
 
-data class MapBounds(val center: Location, val radius: Int, val maxY: Int) {
-    operator fun contains(location: Location): Boolean = isInBoundsVertically(location) && isInBoundsHorizontally(location)
+data class MapBounds(val first: Location, val second: Location) {
+    val minX = minOf(first.blockX, second.blockX)
+    val minY = minOf(first.blockY, second.blockY)
+    val minZ = minOf(first.blockZ, second.blockZ)
+    val maxX = maxOf(first.blockX, second.blockX)
+    val maxY = maxOf(first.blockY, second.blockY)
+    val maxZ = maxOf(first.blockZ, second.blockZ)
 
-    fun isInBoundsVertically(location: Location): Boolean = location.blockY <= maxY
-    fun isInBoundsHorizontally(location: Location): Boolean = (location.blockX - center.blockX).absoluteValue <= radius && (location.blockZ - center.blockZ).absoluteValue <= radius
+    operator fun contains(location: Location): Boolean = location.world == first.world && isInBoundsHorizontally(location) && isInBoundsVertically(location)
+
+    fun isInBoundsVertically(location: Location): Boolean = location.blockY in minY..maxY
+    fun isInBoundsHorizontally(location: Location): Boolean = location.blockX in minX..maxX && location.blockZ in minZ..maxZ
 }
