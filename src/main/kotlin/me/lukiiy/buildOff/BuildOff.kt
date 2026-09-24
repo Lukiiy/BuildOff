@@ -1,11 +1,15 @@
 package me.lukiiy.buildOff
 
+import me.lukiiy.buildOff.arena.MapMaker
+import me.lukiiy.flow.Flow
 import org.bukkit.plugin.java.JavaPlugin
 
 class BuildOff : JavaPlugin() {
-    override fun onEnable() {}
+    val mapMaker = MapMaker()
 
-    override fun onDisable() {}
+    override fun onEnable() {
+        Flow.getInstance().manager.register(Entry())
+    }
 
     companion object {
         fun getInstance(): BuildOff = getPlugin(BuildOff::class.java)
