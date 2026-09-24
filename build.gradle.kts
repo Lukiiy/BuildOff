@@ -11,12 +11,10 @@ repositories {
 dependencies {
     paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation(files("lib/paper.jar")) // engine
+    compileOnly(files("lib/paper.jar")) // engine
 }
 
-kotlin {
-    jvmToolchain(21)
-}
+kotlin.jvmToolchain(21)
 
 tasks {
     build {
