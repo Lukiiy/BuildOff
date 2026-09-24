@@ -1,12 +1,17 @@
 package me.lukiiy.buildOff.arena
 
+import me.lukiiy.buildOff.Plot
+import me.lukiiy.flow.MinigameException
 import org.bukkit.*
+import org.bukkit.block.structure.Mirror
+import org.bukkit.block.structure.StructureRotation
 import org.bukkit.generator.ChunkGenerator
+import java.io.File
 import java.util.*
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.floor
-import kotlin.math.sin
+import kotlin.math.ceil
+import kotlin.math.sqrt
 
 class MapMaker {
     fun create(): World? {
@@ -26,53 +31,65 @@ class MapMaker {
     class VoidGen : ChunkGenerator()
 
     companion object {
-        const val PI2 = PI * 2
+        fun genGrid(world: World, players: List<UUID>): List<Plot> {
+            val count = players.size
+            if (count == 0) return emptyList()
 
-        fun genPillars(center: Location, totalPoints: Int, initialRadius: Int): List<Location> {
-            val world = center.world ?: return emptyList()
-            val top = ArrayList<Location>(totalPoints)
-            var pointsRemaining = totalPoints
-            var currentIdx = 0
+            val file = File(Bukkit.getWorldContainer().getParentFile(), "buildoff").listFiles { `_`: File?, name: String? -> name!!.endsWith(".nbt") }?.first() ?: throw MinigameException("Uhm, where's the structure file again?")
+            val structure = Bukkit.getStructureManager().loadStructure(file)
 
-            while (pointsRemaining > 0) {
-                val ringCapacity = 8 + (currentIdx * 4)
-                val ringPoints = minOf(pointsRemaining, ringCapacity)
-                val currentRadius = initialRadius + (currentIdx * 8) // ring spacing!
-                val angleStep = PI2 / ringPoints
+            val size = structure.size
+            val sizeX = size.blockX
+            val sizeZ = size.blockZ
+            val stepX = sizeX - 1
+            val stepZ = sizeZ - 1
+            val gridSize = ceil(sqrt(count.toDouble())).toInt()
+            val plots = mutableListOf<Plot>()
 
-                repeat(ringPoints) {
-                    val angle = it * angleStep
+            players.forEachIndexed { idx, uuid ->
+                val gridX = idx % gridSize
+                val gridZ = idx / gridSize
+                val origin = Location(world, (gridX * stepX).toDouble(), 64.0, (gridZ * stepZ).toDouble())
 
-                    // calculate coords
-                    val x = (center.x + floor(currentRadius * cos(angle))).toInt()
-                    val z = (center.z + floor(currentRadius * sin(angle))).toInt()
-
-                    for (y in 32..96) world.getBlockAt(x, y, z).setType(Material.BEDROCK, false)
-
-                    top.add(Location(world, x + .5, 97.0, z + .5))
-                }
-
-                pointsRemaining -= ringPoints
-                currentIdx++
+                structure.place(origin, false, StructureRotation.NONE, Mirror.NONE, 0, 1.0f, ThreadLocalRandom.current())
+                plots.add(getPlot(uuid, world, origin, sizeX, size.blockY, sizeZ))
             }
 
-            return top
+            return plots
         }
 
-        fun getBounds(center: Location, totalPoints: Int, initialRadius: Int): MapBounds {
-            var points = totalPoints
-            var ring = 0
+        private fun getPlot(owner: UUID, world: World, origin: Location, sizeX: Int, sizeY: Int, sizeZ: Int): Plot { // TODO: i mean, one structure is enough so why the trouble to code this if im just gonna repeat basically the same results
+            val glass = mutableListOf<Location>()
 
-            while (points > 0) {
-                val ringCapacity = 8 + ring * 4
+            for (x in origin.blockX until (origin.blockX + sizeX)) {
+                for (y in origin.blockY until (origin.blockY + sizeY)) {
+                    for (z in origin.blockZ until (origin.blockZ + sizeZ)) {
+                        val block = world.getBlockAt(x, y, z)
 
-                points -= ringCapacity
-                ring++
+                        if (block.type == Material.GLASS) {
+                            glass.add(block.location.clone())
+
+                            block.type = Material.AIR
+                        }
+                    }
+                }
             }
 
-            val outerRadius = initialRadius + (ring - 1) * 8
+            if (glass.size < 2) throw MinigameException("structure needs at least 2 corners for the build zones. Place 2 glass blocks.")
 
-            return MapBounds(center, outerRadius + 8, 112)
+            val minX = glass.minOf { it.blockX }
+            val minY = glass.minOf { it.blockY }
+            val minZ = glass.minOf { it.blockZ }
+            val maxX = glass.maxOf { it.blockX }
+            val maxY = glass.maxOf { it.blockY }
+            val maxZ = glass.maxOf { it.blockZ }
+
+            val bounds = MapBounds(Location(world, minX.toDouble(), minY.toDouble(), minZ.toDouble()), Location(world, maxX.toDouble(), maxY.toDouble(), maxZ.toDouble()))
+
+            val centerX = (minX + maxX) / 2.0 + .5
+            val centerZ = (minZ + maxZ) / 2.0 + .5
+
+            return Plot(owner, bounds, Location(world, centerX, minY.toDouble() + 1.0, centerZ))
         }
     }
 }
