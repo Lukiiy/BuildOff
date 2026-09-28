@@ -1,3 +1,3 @@
 package me.lukiiy.buildOff
 
-enum class State { BUILDING, VOTING, ENDED }
+enum class State { COUNTING, BUILDING, VOTING, ENDED }
