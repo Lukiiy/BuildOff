@@ -6,6 +6,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 class BuildOff : JavaPlugin() {
     val mapMaker = MapMaker()
+    val themeFile = ThemeFile()
 
     override fun onEnable() {
         Flow.getInstance().manager.register(Entry())
