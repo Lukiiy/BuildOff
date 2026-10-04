@@ -77,7 +77,7 @@ class MapMaker {
                     val maxY = glass.maxOf { it.y }
                     val maxZ = glass.maxOf { it.z }
 
-                    minRel = Vector(minX, minY, minZ)
+                    minRel = Vector(minX, minY - 1, minZ)
                     maxRel = Vector(maxX, maxY, maxZ)
                     spawnRel = Vector((minX + maxX) / 2 + .5, minY + 5, (minZ + maxZ) / 2 + .5)
                 }
