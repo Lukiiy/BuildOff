@@ -7,15 +7,15 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 object Items {
-    val BAD = ItemStack(Material.RED_CONCRETE).apply {
+    val BAD = ItemStack(Material.RED_DYE).apply {
         setData(DataComponentTypes.ITEM_NAME, "Bad".asMini().color(FDefaults.RED))
     }
 
-    val OK = ItemStack(Material.YELLOW_CONCRETE).apply {
+    val OK = ItemStack(Material.YELLOW_DYE).apply {
         setData(DataComponentTypes.ITEM_NAME, "Ok".asMini().color(FDefaults.ORANGE))
     }
 
-    val GOOD = ItemStack(Material.LIME_CONCRETE).apply {
+    val GOOD = ItemStack(Material.LIME_DYE).apply {
         setData(DataComponentTypes.ITEM_NAME, "Good".asMini().color(FDefaults.GREEN))
     }
 }
