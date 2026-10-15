@@ -21,6 +21,9 @@ class MapMaker {
             setGameRule(GameRules.SPAWN_MOBS, false)
             setGameRule(GameRules.ADVANCE_WEATHER, false)
             setGameRule(GameRules.SPECTATORS_GENERATE_CHUNKS, false)
+            setGameRule(GameRules.BLOCK_DROPS, false)
+            setGameRule(GameRules.MOB_DROPS, false)
+
             isAutoSave = false
             spawnLocation = Location(this, 0.0, 97.0, 0.0).toCenterLocation()
         } ?: return null
