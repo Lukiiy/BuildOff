@@ -56,7 +56,7 @@ class Game : Minigame() { // todo text + theme selection method
                 }
             }
 
-            Bukkit.getGlobalRegionScheduler().runDelayed(BuildOff.getInstance(), { _ -> startVotingPhase() }, 100L)
+            Bukkit.getGlobalRegionScheduler().runDelayed(BuildOff.instance, { _ -> startVotingPhase() }, 100L)
         }).apply {
             onTime(120) { broadcast("⌚ 2 minutes remaining!".asMini().color(FDefaults.YELLOW)) }
             onTime(60) { broadcast("⌚ 1 minute remaining!".asMini().color(FDefaults.ORANGE)) }
@@ -75,9 +75,9 @@ class Game : Minigame() { // todo text + theme selection method
     override fun listeners(): List<Listener?> = listOf(Listen(this))
 
     override fun prepare() {
-        world = BuildOff.getInstance().mapMaker.create() ?: throw MinigameException("Failed to generate world!")
+        world = BuildOff.instance.mapMaker.create() ?: throw MinigameException("Failed to generate world!")
 
-        BuildOff.getInstance().themeFile.apply {
+        BuildOff.instance.themeFile.apply {
             loadThemes()
 
             if (getThemes().isEmpty()) throw MinigameException("No themes detected.")
@@ -89,15 +89,16 @@ class Game : Minigame() { // todo text + theme selection method
         if (players.isEmpty()) return
 
         plots.addAll(MapMaker.genGrid(world, players.map { it.player.uniqueId }))
-        theme = BuildOff.getInstance().themeFile.getRandomTheme() ?: "???"
+        theme = BuildOff.instance.themeFile.getRandomTheme() ?: "???"
 
         players.forEach {
             val p = it.player
             val plot = plots.first { plot -> plot.owner == p.uniqueId }
 
             p.teleportAsync(plot.spawn).thenAccept {
-                p.scheduler.run(BuildOff.getInstance(), {
+                p.scheduler.run(BuildOff.instance, {
                     p.softReset(GameMode.ADVENTURE)
+
                     p.allowFlight = true
                     p.isFlying = true
 
@@ -111,7 +112,7 @@ class Game : Minigame() { // todo text + theme selection method
         broadcast(Component.newline().append(" » ".asMini().color(FDefaults.DARK_GRAY)).append("ℹ Build a structure based on a theme within the time limit!".asMini().color(FDefaults.YELLOW)).appendNewline())
         val totalSeconds = 5
 
-        Countdown(BuildOff.getInstance(), Duration.ofSeconds(totalSeconds.toLong()), { c ->
+        Countdown(BuildOff.instance, Duration.ofSeconds(totalSeconds.toLong()), { c ->
             val secondsLeft = (c + 1).toInt()
 
             val color = when {
@@ -173,6 +174,7 @@ class Game : Minigame() { // todo text + theme selection method
 
         if (currentPlotIdx >= plots.size) {
             finish()
+
             return
         }
 
@@ -236,7 +238,7 @@ class Game : Minigame() { // todo text + theme selection method
 
         winnerPlot?.let { plot -> forEachPlayer { it.player.teleport(plot.spawn) } }
 
-        Bukkit.getGlobalRegionScheduler().runDelayed(BuildOff.getInstance(), { stop() }, 200L)
+        Bukkit.getGlobalRegionScheduler().runDelayed(BuildOff.instance, { stop() }, 200L)
     }
 
     override fun onStop() {
@@ -248,11 +250,9 @@ class Game : Minigame() { // todo text + theme selection method
 
         if (wFolder.exists()) {
             try {
-                Files.walk(wFolder.toPath()).use { stream ->
-                    stream.sorted(Comparator.reverseOrder()).forEach { p -> p.toFile().delete() }
-                }
+                Files.walk(wFolder.toPath()).use { it.sorted(Comparator.reverseOrder()).forEach { p -> p.toFile().delete() } }
             } catch (e: IOException) {
-                BuildOff.getInstance().logger.severe("Could not delete build battle world ${wFolder.name}: ${e.message}")
+                BuildOff.instance.logger.severe("Could not delete build battle world ${wFolder.name}: ${e.message}")
             }
         }
     }

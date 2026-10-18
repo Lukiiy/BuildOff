@@ -13,6 +13,7 @@ class BuildOff : JavaPlugin() {
     }
 
     companion object {
-        fun getInstance(): BuildOff = getPlugin(BuildOff::class.java)
+        val instance: BuildOff
+            get() = getPlugin(BuildOff::class.java)
     }
 }
