@@ -41,9 +41,9 @@ class Game : Minigame() { // todo text + theme selection method
 
     private val buildTimer by lazy {
         Timer(entry().buildTime.value.toInt(), TimerDirection.DOWN, onTick = {
-            boards.values.forEach { b -> b.update("Building: ${it.formattedTime}") }
+            boards.values.forEach { b -> b.update("Building".asMini(), it.formattedTime.asMini()) }
         }, onEnd = {
-            boards.values.forEach { it.update("Time's Over!") }
+            boards.values.forEach { it.update("Time's Over!".asMini()) }
             broadcast("Time's Over!".asMini())
 
             gameState = State.COUNTING
@@ -190,7 +190,7 @@ class Game : Minigame() { // todo text + theme selection method
         voteTimer?.let { removeSystem(it) }
 
         voteTimer = Timer(entry().voteTime.value.toInt(), TimerDirection.DOWN, onTick = { t ->
-            boards.values.forEach { b -> b.update("Voting: ${t.formattedTime}") }
+            boards.values.forEach { it.update("Voting".asMini(), t.formattedTime.asMini()) }
         }, onEnd = {
             advanceVote()
         }).also { addSystem(it) }
@@ -258,9 +258,10 @@ class Game : Minigame() { // todo text + theme selection method
     }
 
     class Board(player: Player) {
-        private val board = OnlyBoard(player, "Build Battle".asMini().color(FDefaults.YELLOW).decorate(TextDecoration.BOLD))
+        private val board = OnlyBoard(player, "Build Off".asMini().color(FDefaults.YELLOW).decorate(TextDecoration.BOLD))
 
-        fun update(line: String) = board.updateLines(Component.text(line).color(FDefaults.WHITE))
+        fun update(a: Component, b: Component? = null) = if (b == null) board.updateLines(Component.empty(), a.colorIfAbsent(FDefaults.WHITE), Component.empty()) else board.updateLines(Component.empty(), a.colorIfAbsent(FDefaults.WHITE), b.colorIfAbsent(FDefaults.LIGHT_YELLOW), Component.empty())
+
         fun destroy() = board.destroy()
     }
 
