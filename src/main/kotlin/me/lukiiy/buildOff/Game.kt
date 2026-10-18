@@ -58,15 +58,15 @@ class Game : Minigame() { // todo text + theme selection method
 
             Bukkit.getGlobalRegionScheduler().runDelayed(BuildOff.getInstance(), { _ -> startVotingPhase() }, 100L)
         }).apply {
-            onTime(120) { broadcast("2 minutes remaining!".asMini().color(FDefaults.YELLOW)) }
-            onTime(60) { broadcast("1 minute remaining!".asMini().color(FDefaults.ORANGE)) }
-            onTime(30) { broadcast("30 seconds remaining!".asMini().color(FDefaults.ORANGE)) }
-            onTime(10) { broadcast("10 seconds remaining!".asMini().color(FDefaults.RED)) }
-            onTime(5) { broadcast("5 seconds remaining!".asMini().color(FDefaults.RED)) }
-            onTime(4) { broadcast("4 seconds remaining!".asMini().color(FDefaults.RED)) }
-            onTime(3) { broadcast("3 seconds remaining!".asMini().color(FDefaults.RED)) }
-            onTime(2) { broadcast("2 seconds remaining!".asMini().color(FDefaults.RED)) }
-            onTime(1) { broadcast("1 second remaining!".asMini().color(FDefaults.RED)) }
+            onTime(120) { broadcast("⌚ 2 minutes remaining!".asMini().color(FDefaults.YELLOW)) }
+            onTime(60) { broadcast("⌚ 1 minute remaining!".asMini().color(FDefaults.ORANGE)) }
+            onTime(30) { broadcast("⌚ 30 seconds remaining!".asMini().color(FDefaults.ORANGE)) }
+            onTime(10) { broadcast("⌚ 10 seconds remaining!".asMini().color(FDefaults.RED)) }
+            onTime(5) { broadcast("⌚ 5 seconds remaining!".asMini().color(FDefaults.RED)) }
+            onTime(4) { broadcast("⌚ 4 seconds remaining!".asMini().color(FDefaults.RED)) }
+            onTime(3) { broadcast("⌚ 3 seconds remaining!".asMini().color(FDefaults.RED)) }
+            onTime(2) { broadcast("⌚ 2 seconds remaining!".asMini().color(FDefaults.RED)) }
+            onTime(1) { broadcast("⌚ 1 second remaining!".asMini().color(FDefaults.RED)) }
         }
     }
 
