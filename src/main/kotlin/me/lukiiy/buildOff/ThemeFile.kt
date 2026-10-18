@@ -13,14 +13,14 @@ class ThemeFile() {
         val file = File("themes.txt")
 
         if (!file.exists()) {
-            BuildOff.getInstance().logger.severe("no themes file found.")
+            BuildOff.instance.logger.severe("no themes file found.")
             return false
         }
 
         val lines = file.readLines().map { it.trim() }.filter { it.isNotEmpty() }
 
         if (lines.isEmpty()) {
-            BuildOff.getInstance().logger.severe("there are no themes listed.")
+            BuildOff.instance.logger.severe("there are no themes listed.")
             return false
         }
 
