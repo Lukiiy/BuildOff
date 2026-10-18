@@ -143,7 +143,7 @@ class Game : Minigame() { // todo text + theme selection method
                 }
             }
 
-            broadcast(Component.newline().append("The theme is: ".asMini()).append(theme.asMini().color(FDefaults.ORANGE)).append(Component.newline()))
+            broadcast(Component.newline().append(" » ".asMini().color(FDefaults.DARK_GRAY)).append("The chosen theme is: ".asMini().color(FDefaults.LIGHT_YELLOW)).append(theme.asMini().color(FDefaults.LIME)).appendNewline())
         }).start()
     }
 
