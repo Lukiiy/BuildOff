@@ -17,6 +17,10 @@ dependencies {
 kotlin.jvmToolchain(21)
 
 tasks {
+    shadowJar {
+        archiveClassifier.set("")
+    }
+
     build {
         dependsOn(shadowJar)
     }
