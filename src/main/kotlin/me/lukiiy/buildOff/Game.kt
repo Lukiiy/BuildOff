@@ -139,6 +139,7 @@ class Game : Minigame() { // todo text + theme selection method
             forEachPlayer {
                 it!!.player.apply {
                     sendActionBar(Component.empty())
+                    gameMode = GameMode.CREATIVE
 
                     showTitle(Title.title("The theme is:".asMini().color(FDefaults.WHITE), theme.asMini().color(FDefaults.ORANGE), Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(4), Duration.ofSeconds(1))))
                 }
