@@ -1,11 +1,18 @@
 package me.lukiiy.buildOff.arena
 
+import io.papermc.paper.entity.LookAnchor
+import me.lukiiy.buildOff.BuildOff
 import me.lukiiy.buildOff.Plot
 import me.lukiiy.flow.MinigameException
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.*
 import org.bukkit.block.structure.Mirror
 import org.bukkit.block.structure.StructureRotation
+import org.bukkit.entity.Display
+import org.bukkit.entity.TextDisplay
+import org.bukkit.entity.WanderingTrader
 import org.bukkit.generator.ChunkGenerator
+import org.bukkit.persistence.PersistentDataType
 import org.bukkit.util.Vector
 import java.io.File
 import java.util.UUID
@@ -34,6 +41,8 @@ class MapMaker {
     class VoidGen : ChunkGenerator()
 
     companion object {
+        private val floorNPCDisplay = MiniMessage.miniMessage().deserialize("<gradient:#FFD05E:#FF8C5E>Floor Change</gradient>")
+
         fun genGrid(world: World, players: List<UUID>): List<Plot> {
             if (players.isEmpty()) return emptyList()
 
@@ -78,6 +87,30 @@ class MapMaker {
                 glass.forEach { origin.clone().add(it).block.type = Material.AIR }
 
                 villagerSpot?.let { rel ->
+                    val loc = origin.clone().add(rel)
+                    loc.block.type = Material.AIR
+
+                    val center = origin.clone().add(spawnRel).apply { y = loc.y }
+
+                    loc.world.spawn(loc.add(.5, 0.0, .5), WanderingTrader::class.java) {
+                        it.apply {
+                            lookAt(center, LookAnchor.FEET)
+                            setAI(false)
+                            persistentDataContainer.set(BuildOff.instance.key!!, PersistentDataType.BOOLEAN, true)
+
+                            despawnDelay = 0
+                        }
+                    }
+
+                    loc.world.spawn(loc.add(0.0, 2.5, 0.0), TextDisplay::class.java) {
+                        it.apply {
+                            lookAt(center, LookAnchor.FEET)
+                            text(floorNPCDisplay)
+                            persistentDataContainer.set(BuildOff.instance.key!!, PersistentDataType.BOOLEAN, true)
+
+                            billboard = Display.Billboard.FIXED
+                        }
+                    }
                 }
 
                 plots.add(Plot(uuid, MapBounds(origin.clone().add(minRel), origin.clone().add(maxRel)), origin.clone().add(spawnRel)))
