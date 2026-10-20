@@ -249,13 +249,8 @@ class Game : Minigame() { // todo text + theme selection method
     }
 
     override fun onStop() {
-        Flow.getInstance().manager.lobby?.let {
-            forEachPlayer { fp ->
-                boards[fp.player.uniqueId]?.destroy()
-
-                it.sendToLobby(fp!!)
-            }
-        }
+        boards.values.forEach { it.destroy() }
+        Flow.getInstance().manager.lobby?.let { forEachPlayer { fp -> it.sendToLobby(fp!!) } }
 
         val wFolder = world.worldFolder
 
