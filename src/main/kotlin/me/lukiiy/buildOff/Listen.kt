@@ -6,9 +6,12 @@ import me.lukiiy.flow.FDefaults
 import me.lukiiy.flow.FUtils.asMini
 import me.lukiiy.flow.FlowPlayer
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.ArmorStand
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
 import org.bukkit.event.entity.CreatureSpawnEvent
@@ -102,9 +105,16 @@ class Listen(private val game: Game) : Listener {
             return
         }
 
-        val plot = game.plots.firstOrNull { it.owner == e.player.uniqueId } ?: return
+        val player = e.player
+        val plot = game.plots.firstOrNull { it.owner == player.uniqueId } ?: return
+        val entity = e.rightClicked
 
-        if (!plot.bounds.contains(e.rightClicked.location)) e.isCancelled = true
+        if (entity.persistentDataContainer.has(BuildOff.instance.key!!) && entity.type == EntityType.WANDERING_TRADER && player.inventory.itemInMainHand.type.isBlock && plot.setFloor(player.inventory.itemInMainHand.type)) {
+            player.playSound(player.location, Sound.BLOCK_NOTE_BLOCK_PLING, 1f, 1f)
+            player.sendActionBar("☄ The floor has changed!".asMini().color(FDefaults.ORANGE))
+        }
+
+        if (!plot.bounds.contains(entity.location)) e.isCancelled = true
     }
 
     @EventHandler
