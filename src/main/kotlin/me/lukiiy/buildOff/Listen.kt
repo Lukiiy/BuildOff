@@ -72,7 +72,6 @@ class Listen(private val game: Game) : Listener {
     @EventHandler
     fun interact(e: PlayerInteractEvent) {
         val p = e.player
-        if (p.world != game.world) return
 
         if (game.gameState == State.VOTING) {
             val item = e.item ?: return
@@ -102,6 +101,7 @@ class Listen(private val game: Game) : Listener {
     fun entityInteract(e: PlayerInteractEntityEvent) {
         if (game.gameState != State.BUILDING) {
             e.isCancelled = true
+
             return
         }
 
@@ -133,7 +133,6 @@ class Listen(private val game: Game) : Listener {
 
         e.entity.apply {
             setAI(false)
-
             lookAt(game.getPlayers().filterIsInstance<FlowPlayer>().firstOrNull { it.player.uniqueId == plot.owner }?.player?.location ?: plot.spawn, LookAnchor.FEET)
 
             health = 0.1
@@ -189,7 +188,7 @@ class Listen(private val game: Game) : Listener {
 
     @EventHandler
     fun blockForm(e: BlockFormEvent) {
-        val plot = game.plots.firstOrNull { it.bounds.contains(e.block.location) } ?: run {
+        game.plots.firstOrNull { it.bounds.contains(e.block.location) } ?: run {
             e.isCancelled = true
             return
         }
@@ -217,7 +216,7 @@ class Listen(private val game: Game) : Listener {
         if (game.gameState != State.BUILDING) e.isCancelled = true
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     fun pickBlock(e: PlayerPickBlockEvent) {
         if (!e.isIncludeData) return
 
