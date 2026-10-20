@@ -12,6 +12,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
 import org.bukkit.event.entity.CreatureSpawnEvent
+import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.entity.ProjectileLaunchEvent
 import org.bukkit.event.player.*
@@ -225,5 +226,10 @@ class Listen(private val game: Game) : Listener {
         e.isCancelled = true
 
         if (!e.player.world.isDayTime || e.player.world.isThundering) e.player.sendActionBar("You may not rest now; there's a build competition happening".asMini())
+    }
+
+    @EventHandler
+    fun dmg(e: EntityDamageEvent) {
+        if (e.entity is Player || e.entity.persistentDataContainer.has(BuildOff.instance.key!!)) e.isCancelled = true
     }
 }
