@@ -119,11 +119,7 @@ class Listen(private val game: Game) : Listener {
 
     @EventHandler
     fun creatureSpawn(e: CreatureSpawnEvent) {
-        if (game.gameState != State.BUILDING) {
-            e.isCancelled = true
-
-            return
-        }
+        if (game.gameState != State.BUILDING) return
 
         val plot = game.plots.firstOrNull { it.bounds.contains(e.location) }
         if (plot == null) {
@@ -138,6 +134,7 @@ class Listen(private val game: Game) : Listener {
             health = 0.1
             isPersistent = false
             isCollidable = false
+            isInvulnerable = true
 
             (this as? ArmorStand)?.setArms(true)
         }
@@ -239,6 +236,6 @@ class Listen(private val game: Game) : Listener {
 
     @EventHandler
     fun dmg(e: EntityDamageEvent) {
-        if (e.entity is Player || e.entity.persistentDataContainer.has(BuildOff.instance.key!!)) e.isCancelled = true
+        if (e.entity is Player || e.entity.persistentDataContainer.has(BuildOff.instance.key!!) || game.gameState == State.VOTING) e.isCancelled = true
     }
 }
