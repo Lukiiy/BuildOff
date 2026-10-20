@@ -15,6 +15,7 @@ import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.title.Title
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.SoundCategory
 import org.bukkit.World
@@ -54,6 +55,11 @@ class Game : Minigame() { // todo text + theme selection method
                     allowFlight = true
                     isFlying = true
                 }
+            }
+
+            world.entities.filter { it.persistentDataContainer.has(BuildOff.instance.key!!) }.forEach {
+                world.spawnParticle(Particle.CLOUD, it.location.add(0.0, 1.0, 0.0), 2, .125, 0.0, .125)
+                it.remove()
             }
 
             Bukkit.getGlobalRegionScheduler().runDelayed(BuildOff.instance, { _ -> startVotingPhase() }, 100L)
