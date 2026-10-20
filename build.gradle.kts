@@ -21,10 +21,6 @@ tasks {
         dependsOn(shadowJar)
     }
 
-    jar {
-        enabled = false
-    }
-
     processResources {
         val props = mapOf("version" to version, "description" to project.description)
         filesMatching("paper-plugin.yml") {
