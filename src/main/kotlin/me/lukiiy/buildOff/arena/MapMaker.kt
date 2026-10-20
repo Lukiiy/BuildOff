@@ -44,49 +44,43 @@ class MapMaker {
             val stepX = size.blockX - 1
             val stepZ = size.blockZ - 1
             val gridSize = ceil(sqrt(players.size.toDouble())).toInt()
+            val palette = structure.palettes.firstOrNull() ?: throw MinigameException("no palette found")
 
-            var glassOff: List<Vector>? = null
-            var minRel: Vector? = null
-            var maxRel: Vector? = null
-            var spawnRel: Vector? = null
+            val glass = mutableListOf<Vector>()
+            var villagerSpot: Vector? = null
+
+            for (blockInfo in palette.blocks) {
+                val pos = blockInfo.location
+                val mat = blockInfo.blockData.material
+
+                if (mat == Material.GLASS) glass.add(Vector(pos.x, pos.y, pos.z))
+                if (mat == Material.YELLOW_STAINED_GLASS) villagerSpot = Vector(pos.x, pos.y, pos.z)
+            }
+
+            if (glass.size < 2) throw MinigameException("structure needs at least 2 corners for the build zones. Place 2 glass blocks.")
+
+            val minX = glass.minOf { it.x }
+            val minY = glass.minOf { it.y }
+            val minZ = glass.minOf { it.z }
+            val maxX = glass.maxOf { it.x }
+            val maxY = glass.maxOf { it.y }
+            val maxZ = glass.maxOf { it.z }
+            val minRel = Vector(minX, minY - 1, minZ)
+            val maxRel = Vector(maxX, maxY, maxZ)
+            val spawnRel = Vector((minX + maxX) / 2 + .5, minY + 5, (minZ + maxZ) / 2 + .5)
+
             val plots = mutableListOf<Plot>()
 
             players.forEachIndexed { idx, uuid ->
                 val origin = Location(world, (idx % gridSize * stepX).toDouble(), 64.0, (idx / gridSize * stepZ).toDouble())
 
                 structure.place(origin, false, StructureRotation.NONE, Mirror.NONE, 0, 1f, ThreadLocalRandom.current())
+                glass.forEach { origin.clone().add(it).block.type = Material.AIR }
 
-                if (glassOff == null) {
-                    val glass = mutableListOf<Vector>()
-
-                    for (x in 0 until size.blockX) {
-                        for (y in 0 until size.blockY) {
-                            for (z in 0 until size.blockZ) {
-                                val block = world.getBlockAt(origin.blockX + x, origin.blockY + y, origin.blockZ + z)
-
-                                if (block.type == Material.GLASS) glass.add(Vector(x, y, z))
-                            }
-                        }
-                    }
-
-                    if (glass.size < 2) throw MinigameException("structure needs at least 2 corners for the build zones. Place 2 glass blocks.")
-
-                    glassOff = glass
-
-                    val minX = glass.minOf { it.x }
-                    val minY = glass.minOf { it.y }
-                    val minZ = glass.minOf { it.z }
-                    val maxX = glass.maxOf { it.x }
-                    val maxY = glass.maxOf { it.y }
-                    val maxZ = glass.maxOf { it.z }
-
-                    minRel = Vector(minX, minY - 1, minZ)
-                    maxRel = Vector(maxX, maxY, maxZ)
-                    spawnRel = Vector((minX + maxX) / 2 + .5, minY + 5, (minZ + maxZ) / 2 + .5)
+                villagerSpot?.let { rel ->
                 }
 
-                glassOff.forEach { origin.clone().add(it).block.type = Material.AIR }
-                plots.add(Plot(uuid, MapBounds(origin.clone().add(minRel!!), origin.clone().add(maxRel!!)), origin.clone().add(spawnRel!!)))
+                plots.add(Plot(uuid, MapBounds(origin.clone().add(minRel), origin.clone().add(maxRel)), origin.clone().add(spawnRel)))
             }
 
             return plots
