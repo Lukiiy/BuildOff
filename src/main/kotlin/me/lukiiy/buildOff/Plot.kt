@@ -11,7 +11,7 @@ data class Plot(val owner: UUID, val bounds: MapBounds, val spawn: Location, val
 
     fun setFloor(material: Material) {
         val world = bounds.first.world ?: return
-        val floorY = bounds.minY - 1
+        val floorY = bounds.minY
 
         for (x in bounds.minX..bounds.maxX) {
             for (z in bounds.minZ..bounds.maxZ) world.getBlockAt(x, floorY, z).type = material
