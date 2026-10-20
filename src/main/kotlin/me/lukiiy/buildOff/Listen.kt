@@ -208,10 +208,9 @@ class Listen(private val game: Game) : Listener {
 
     @EventHandler
     fun pickBlock(e: PlayerPickBlockEvent) {
-        if (!e.isIncludeData) {
-            e.player.sendMessage("crazy")
-            return;
-        }
+        if (!e.isIncludeData) return
+
+        e.isCancelled = true
 
         e.player.inventory.setItem(e.targetSlot, ItemStack.of(e.block.type))
     }
